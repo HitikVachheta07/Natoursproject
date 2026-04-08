@@ -1,31 +1,33 @@
-name: Deploy Natours App to AWS EC2
+name: 🚀 Direct Deploy to EC2
 
 on:
   push:
     branches:
-      - main   # change if your branch is different
+      - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # 🔥 THIS IS KEY
 
     steps:
-      - name: 🚀 Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            echo "📦 Pulling latest code..."
-            cd ~/natours || git clone https://github.com/HitikVachheta07/Natoursproject.git ~/natours
-            cd ~/natours
-            git pull origin main 
+      - name: 📥 Pull latest code
+        run: |
+          cd ~/natours || git clone https://github.com/HitikVachheta07/Natoursproject.git ~/natours
+          cd ~/natours
+          cd ~/FinalSection
+          git pull origin main
 
-            echo "📦 Installing dependencies..."
-            npm install
+      - name: 📦 Install dependencies
+        run: |
+          cd ~/natours
+          cd ~/FinalSection
+          npm install
 
-            echo "🔄 Restarting app with PM2..."
-            pm2 restart natours || pm2 start server.js --name natours
+      - name: 🔄 Restart server
+        run: |
+          pm2 stop natours || true
+          pm2 start server.js --name natours
+          pm2 save
 
-            echo "✅ Deployment successful!"
+      - name: ✅ Done
+        run: echo "Deployment successful 🚀"
