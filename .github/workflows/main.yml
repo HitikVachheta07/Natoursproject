@@ -1,4 +1,4 @@
-name: 🚀 Direct Deploy to EC2
+name: 🚀 Deploy Natours
 
 on:
   push:
@@ -7,27 +7,26 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted   # 🔥 THIS IS KEY
+    runs-on: self-hosted
 
     steps:
-      - name: 📥 Pull latest code
-        run: |
-          cd ~/natours || git clone https://github.com/HitikVachheta07/Natoursproject.git ~/natours
-          cd ~/natours
-          cd ~/FinalSection
-          git pull origin main
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
 
-      - name: 📦 Install dependencies
+      - name: 📁 Setup Folder
         run: |
-          cd ~/natours
-          cd ~/FinalSection
+          rm -rf ~/natours
+          mkdir -p ~/natours
+          cp -r * ~/natours/
+
+      - name: 📦 Install
+        run: |
+          cd ~/natours/natours/FinalSection
           npm install
 
-      - name: 🔄 Restart server
+      - name: 🔄 Restart App
         run: |
-          pm2 stop natours || true
+          cd ~/natours/natours/FinalSection
+          pm2 delete natours || true
           pm2 start server.js --name natours
           pm2 save
-
-      - name: ✅ Done
-        run: echo "Deployment successful 🚀"
